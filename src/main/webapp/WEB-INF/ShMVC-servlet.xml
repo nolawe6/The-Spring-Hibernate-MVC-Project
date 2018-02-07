@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="
+    	http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+	
+	<mvc:annotation-driven/>
+   <context:component-scan base-package = "bank" />
+
+   <bean class = "org.springframework.web.servlet.view.InternalResourceViewResolver">
+      <property name = "prefix" value = "/WEB-INF/jsp/" />
+      <property name = "suffix" value = ".jsp" />
+   </bean>
+   
+   <context:annotation-config />
+
+ 
+<!-- 	<bean id="accountService" class="bankService.AccountService"> -->
+<!-- 		<property name="accountDAOHibernate" ref="accountDAOHibernate"/> -->
+<!-- 		<property name="currencyConverter" ref="currencyConverter"/> -->
+<!-- 	</bean> -->
+	
+<!-- 	<bean id="currencyConverter" class="bankService.CurrencyConverter"></bean> -->
+<!-- 	<bean id="accountDAO" class="bankDAO.AccountDAO"> -->
+<!-- 		<property name="sessionFactory" ref="sessionFactory"/> -->
+		
+<!-- 	</bean> -->
+	
+	
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/bankf" />
+		<property name="username" value="root" />
+		<property name="password" value="mumsql" />
+	</bean>
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties" ref="hibernateProperties" />
+		<property name="annotatedClasses">
+			<list>
+				<value>bank.domain.Account</value>
+				<value>bank.domain.AccountEntry</value>
+				<value>bank.domain.Customer</value>
+			</list>
+		</property>
+	</bean>
+        <bean id="hibernateProperties"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="properties">
+			<props>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="connection.pool.size">1</prop>
+				<prop key="hibernate.show_sql">true</prop>
+<!-- 				<prop key="hibernate.current_session_context_class">thread</prop> -->
+				
+			</props>
+		</property>
+		</bean>
+<!-- 			proxy-target-class="true" -->
+		<tx:annotation-driven proxy-target-class="true" transaction-manager="transactionManager"/>
+		<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+			<property name="sessionFactory" ref="sessionFactory"/>
+		</bean>   
+
+</beans>
